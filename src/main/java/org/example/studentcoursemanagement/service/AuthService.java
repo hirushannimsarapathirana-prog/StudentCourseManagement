@@ -3,6 +3,8 @@ package org.example.studentcoursemanagement.service;
 import org.example.studentcoursemanagement.dto.LoginRequestDTO;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,14 +23,24 @@ public class AuthService {
 
     public String login(LoginRequestDTO request) {
 
+        // Create username + password authentication request
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 );
 
-        authenticationManager.authenticate(authenticationToken);
+        // Authenticate user
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        authenticationToken
+                );
 
-        return jwtService.generateToken(request.getUsername());
+        // Get authenticated user's details
+        UserDetails userDetails =
+                (UserDetails) authentication.getPrincipal();
+
+        // Generate JWT with username + role
+        return jwtService.generateToken(userDetails);
     }
 }

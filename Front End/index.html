@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Course Management System</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- =========================================================
+     LOGIN PAGE
+========================================================= -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            <div class="logo-icon">🎓</div>
+            <h1>CourseHub</h1>
+            <p>Student Course Management System</p>
+        </div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label>Username / Email</label>
+
+                <input
+                    type="text"
+                    id="loginUsername"
+                    placeholder="Enter username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter password"
+                    required
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary btn-full">
+
+                Login
+
+            </button>
+
+        </form>
+
+        <div id="loginMessage" class="message"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN APPLICATION
+========================================================= -->
+
+<div id="appPage" class="app-page hidden">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🎓
+            </div>
+
+            <div>
+                <h2>CourseHub</h2>
+                <span>Management System</span>
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="navigation">
+
+            <!-- Dashboard -->
+
+            <button
+                class="nav-item active"
+                onclick="showPage('dashboard')">
+
+                <span>📊</span>
+                Dashboard
+
+            </button>
+
+
+            <!-- ================= ADMIN STUDENT MANAGEMENT ================= -->
+
+            <button
+                class="nav-item admin-only"
+                onclick="showPage('students')">
+
+                <span>👥</span>
+                Students
+
+            </button>
+
+
+            <!-- ================= COURSES ================= -->
+
+            <button
+                class="nav-item"
+                onclick="showPage('courses')">
+
+                <span>📚</span>
+                Courses
+
+            </button>
+
+
+            <!-- Available courses for students -->
+
+            <button
+                class="nav-item student-only"
+                onclick="showPage('availableCourses')">
+
+                <span>🔎</span>
+                Available Courses
+
+            </button>
+
+
+            <!-- ================= ENROLLMENTS ================= -->
+
+            <button
+                class="nav-item"
+                onclick="showPage('enrollments')">
+
+                <span>📝</span>
+                Enrollments
+
+            </button>
+
+
+            <!-- ================= STUDENT MY COURSES ================= -->
+
+            <button
+                class="nav-item student-only"
+                onclick="showPage('myCourses')">
+
+                <span>🎓</span>
+                My Courses
+
+            </button>
+
+
+            <!-- ================= STUDENT PROFILE ================= -->
+
+            <button
+                class="nav-item student-only"
+                onclick="showPage('profile')">
+
+                <span>👤</span>
+                My Profile
+
+            </button>
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div
+                    class="avatar"
+                    id="userAvatar">
+
+                    U
+
+                </div>
+
+                <div>
+
+                    <strong id="sidebarUsername">
+                        User
+                    </strong>
+
+                    <small id="sidebarRole">
+                        USER
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()">
+
+                🚪 Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h2 id="pageTitle">
+                    Dashboard
+                </h2>
+
+                <p id="pageSubtitle">
+                    Welcome to CourseHub
+                </p>
+
+            </div>
+
+
+            <div class="top-user">
+
+                <div class="avatar">
+
+                    <span id="topAvatar">
+                        U
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <strong id="topUsername">
+                        User
+                    </strong>
+
+                    <span id="topRole">
+                        USER
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================== -->
+
+        <section
+            id="dashboardPage"
+            class="page">
+
+            <!-- Welcome -->
+
+            <div class="welcome-card">
+
+                <div>
+
+                    <span class="welcome-label">
+                        WELCOME BACK
+                    </span>
+
+                    <h1>
+                        Hello,
+                        <span id="welcomeUsername">
+                            User
+                        </span>
+                        👋
+                    </h1>
+
+                    <p>
+                        Manage your courses, students and
+                        enrollments from one place.
+                    </p>
+
+                </div>
+
+                <div class="welcome-icon">
+                    🎓
+                </div>
+
+            </div>
+
+
+            <!-- Statistics -->
+
+            <div class="stats-grid">
+
+
+                <!-- Total Courses -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        📚
+                    </div>
+
+                    <div>
+
+                        <span>Total Courses</span>
+
+                        <strong id="totalCourses">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- My Enrollments -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        📝
+                    </div>
+
+                    <div>
+
+                        <span>My Enrollments</span>
+
+                        <strong id="totalEnrollments">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Admin Students -->
+
+                <div class="stat-card admin-only">
+
+                    <div class="stat-icon purple">
+                        👥
+                    </div>
+
+                    <div>
+
+                        <span>Total Students</span>
+
+                        <strong id="totalStudents">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Admin Enrollments -->
+
+                <div class="stat-card admin-only">
+
+                    <div class="stat-icon orange">
+                        📝
+                    </div>
+
+                    <div>
+
+                        <span>All Enrollments</span>
+
+                        <strong id="allEnrollments">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Role -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        🎯
+                    </div>
+
+                    <div>
+
+                        <span>Account Role</span>
+
+                        <strong id="dashboardRole">
+                            USER
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Dashboard panels -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- Quick Actions -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                Quick Actions
+                            </h3>
+
+                            <p>
+                                Common tasks
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+
+                        <!-- Admin Add Student -->
+
+                        <button
+                            class="quick-action admin-only"
+                            onclick="openStudentModal()">
+
+                            <span>👤</span>
+
+                            <div>
+
+                                <strong>
+                                    Add Student
+                                </strong>
+
+                                <small>
+                                    Register a new student
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <!-- Admin Add Course -->
+
+                        <button
+                            class="quick-action admin-only"
+                            onclick="openCourseModal()">
+
+                            <span>➕</span>
+
+                            <div>
+
+                                <strong>
+                                    Add Course
+                                </strong>
+
+                                <small>
+                                    Create a new course
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <!-- View Courses -->
+
+                        <button
+                            class="quick-action"
+                            onclick="showPage('courses')">
+
+                            <span>📚</span>
+
+                            <div>
+
+                                <strong>
+                                    View Courses
+                                </strong>
+
+                                <small>
+                                    Browse courses
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <!-- Student Enroll -->
+
+                        <button
+                            class="quick-action student-only"
+                            onclick="showPage('availableCourses')">
+
+                            <span>🎓</span>
+
+                            <div>
+
+                                <strong>
+                                    Enroll in Course
+                                </strong>
+
+                                <small>
+                                    Find an available course
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <!-- Enrollments -->
+
+                        <button
+                            class="quick-action"
+                            onclick="showPage('enrollments')">
+
+                            <span>📝</span>
+
+                            <div>
+
+                                <strong>
+                                    Enrollments
+                                </strong>
+
+                                <small>
+                                    View enrollments
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <!-- Student Profile -->
+
+                        <button
+                            class="quick-action student-only"
+                            onclick="showPage('profile')">
+
+                            <span>👤</span>
+
+                            <div>
+
+                                <strong>
+                                    My Profile
+                                </strong>
+
+                                <small>
+                                    View and update profile
+                                </small>
+
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- System Information -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <h3>
+                                System Information
+                            </h3>
+
+                            <p>
+                                Your access level
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-list">
+
+                        <div>
+
+                            <span>
+                                Role
+                            </span>
+
+                            <strong id="infoRole">
+                                USER
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Course Access
+                            </span>
+
+                            <strong>
+                                Available
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Student Access
+                            </span>
+
+                            <strong id="studentAccessInfo">
+                                -
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Enrollment Access
+                            </span>
+
+                            <strong>
+                                Available
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                System Status
+                            </span>
+
+                            <strong class="status-online">
+                                ● Online
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STUDENT MANAGEMENT - ADMIN ONLY
+        ================================================== -->
+
+        <section
+            id="studentsPage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Student Management
+                    </h2>
+
+                    <p>
+                        Add, view, update and delete students
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="btn btn-primary admin-only"
+                    onclick="openStudentModal()">
+
+                    + Add Student
+
+                </button>
+
+            </div>
+
+
+            <!-- Search -->
+
+            <div class="toolbar">
+
+                <input
+                    type="text"
+                    id="studentSearch"
+                    placeholder="🔎 Search students..."
+                    oninput="filterStudents()"
+                >
+
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="loadStudents()">
+
+                    ↻ Refresh
+
+                </button>
+
+            </div>
+
+
+            <!-- Students table -->
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="studentTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COURSES
+        ================================================== -->
+
+        <section
+            id="coursesPage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Course Management
+                    </h2>
+
+                    <p>
+                        View and manage courses
+                    </p>
+
+                </div>
+
+
+                <!-- ADMIN ONLY -->
+
+                <button
+                    class="btn btn-primary admin-only"
+                    onclick="openCourseModal()">
+
+                    + Add Course
+
+                </button>
+
+            </div>
+
+
+            <!-- Search -->
+
+            <div class="toolbar">
+
+                <input
+                    type="text"
+                    id="courseSearch"
+                    placeholder="🔎 Search courses..."
+                    oninput="filterCourses()"
+                >
+
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="loadCourses()">
+
+                    ↻ Refresh
+
+                </button>
+
+            </div>
+
+
+            <!-- Course table -->
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Course</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="courseTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             AVAILABLE COURSES - STUDENT
+        ================================================== -->
+
+        <section
+            id="availableCoursesPage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Available Courses
+                    </h2>
+
+                    <p>
+                        Browse courses and enroll
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="loadCourses()">
+
+                    ↻ Refresh
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="availableCoursesGrid"
+                class="course-grid">
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ENROLLMENTS
+        ================================================== -->
+
+        <section
+            id="enrollmentsPage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2 id="enrollmentTitle">
+                        Enrollments
+                    </h2>
+
+                    <p id="enrollmentSubtitle">
+                        Manage course enrollments
+                    </p>
+
+                </div>
+
+
+                <!-- ADMIN ONLY -->
+
+                <button
+                    class="btn btn-primary admin-only"
+                    onclick="openEnrollmentModal()">
+
+                    + Create Enrollment
+
+                </button>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="enrollmentTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MY COURSES - STUDENT
+        ================================================== -->
+
+        <section
+            id="myCoursesPage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        My Courses
+                    </h2>
+
+                    <p>
+                        Courses you are enrolled in
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="myCoursesGrid"
+                class="course-grid">
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MY PROFILE - STUDENT
+        ================================================== -->
+
+        <section
+            id="profilePage"
+            class="page hidden">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        My Profile
+                    </h2>
+
+                    <p>
+                        View and update your personal information
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-card">
+
+
+                <div class="profile-avatar">
+
+                    <span id="profileAvatar">
+                        U
+                    </span>
+
+                </div>
+
+
+                <div class="profile-info">
+
+                    <div class="profile-row">
+
+                        <label>
+                            Student ID
+                        </label>
+
+                        <span id="profileStudentId">
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <span id="profileUsername">
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <label>
+                            Name
+                        </label>
+
+                        <span id="profileName">
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <span id="profileEmail">
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <label>
+                            Role
+                        </label>
+
+                        <span id="profileRole">
+                            STUDENT
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="openProfileModal()">
+
+                        ✏️ Update Profile
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     STUDENT MODAL
+========================================================= -->
+
+<div
+    id="studentModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="studentModalTitle">
+                    Add Student
+                </h2>
+
+                <p>
+                    Enter student information
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeStudentModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form id="studentForm">
+
+
+            <input
+                type="hidden"
+                id="studentEditId"
+            >
+
+
+            <div class="form-group">
+
+                <label>
+                    Name
+                </label>
+
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="studentEmail"
+                    placeholder="Enter email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="studentUsername"
+                    placeholder="Enter username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="studentPassword"
+                    placeholder="Enter password"
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closeStudentModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Save Student
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     PROFILE UPDATE MODAL
+========================================================= -->
+
+<div
+    id="profileModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    Update My Profile
+                </h2>
+
+                <p>
+                    Update your personal information
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeProfileModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form id="profileForm">
+
+
+            <div class="form-group">
+
+                <label>
+                    Name
+                </label>
+
+                <input
+                    type="text"
+                    id="profileEditName"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="profileEditEmail"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="profileEditUsername"
+                    required
+                >
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closeProfileModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Update Profile
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     COURSE MODAL
+========================================================= -->
+
+<div
+    id="courseModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="courseModalTitle">
+                    Add Course
+                </h2>
+
+                <p>
+                    Enter course information
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeCourseModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form id="courseForm">
+
+
+            <input
+                type="hidden"
+                id="courseId"
+            >
+
+
+            <div class="form-group">
+
+                <label>
+                    Course Name
+                </label>
+
+                <input
+                    type="text"
+                    id="courseName"
+                    required
+                    placeholder="Enter course name"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="courseDescription"
+                    rows="5"
+                    placeholder="Enter course description"
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closeCourseModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Save Course
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ENROLLMENT MODAL
+========================================================= -->
+
+<div
+    id="enrollmentModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="enrollmentModalTitle">
+                    Create Enrollment
+                </h2>
+
+                <p>
+                    Enter enrollment information
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeEnrollmentModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form id="enrollmentForm">
+
+
+            <input
+                type="hidden"
+                id="enrollmentId"
+            >
+
+
+            <!-- ADMIN enters student -->
+
+            <div class="form-group admin-only">
+
+                <label>
+                    Student ID
+                </label>
+
+                <input
+                    type="number"
+                    id="studentId"
+                    placeholder="Enter student ID"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Course
+                </label>
+
+                <select
+                    id="enrollmentCourse"
+                    required>
+
+                    <option value="">
+                        Select course
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closeEnrollmentModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    Save Enrollment
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     COURSE DETAILS MODAL
+========================================================= -->
+
+<div
+    id="detailsModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    Course Details
+                </h2>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeDetailsModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="courseDetails"
+            class="course-details">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
+<div
+    id="toast"
+    class="toast">
+
+    <span id="toastMessage">
+        Message
+    </span>
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
