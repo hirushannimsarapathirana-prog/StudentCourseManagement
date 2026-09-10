@@ -5,6 +5,7 @@ import org.example.studentcoursemanagement.dto.EnrollmentRequestDTO;
 import org.example.studentcoursemanagement.dto.EnrollmentResponseDTO;
 import org.example.studentcoursemanagement.service.EnrollmentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,77 +16,206 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
-    public EnrollmentController(EnrollmentService enrollmentService) {
+    public EnrollmentController(
+            EnrollmentService enrollmentService) {
+
         this.enrollmentService = enrollmentService;
     }
 
-    // Create Enrollment
+
+    // ==========================================
+    // CREATE ENROLLMENT
+    // ADMIN + STUDENT
+    // ==========================================
+
     @PostMapping
     public ResponseEntity<EnrollmentResponseDTO> createEnrollment(
-            @Valid @RequestBody EnrollmentRequestDTO request) {
+            @Valid @RequestBody EnrollmentRequestDTO request,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
-                enrollmentService.createEnrollment(request)
+                enrollmentService.createEnrollment(
+                        request,
+                        authentication.getName()
+                )
         );
     }
 
-    // Get All Enrollments
+
+    // ==========================================
+    // GET ALL
+    // ADMIN ONLY
+    // ==========================================
+
     @GetMapping
-    public ResponseEntity<List<EnrollmentResponseDTO>> getAllEnrollments() {
+    public ResponseEntity<List<EnrollmentResponseDTO>>
+    getAllEnrollments(Authentication authentication) {
+
+        boolean isAdmin =
+                authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(authority ->
+                                authority.getAuthority()
+                                        .equals("ROLE_ADMIN")
+                        );
+
+        if (!isAdmin) {
+            return ResponseEntity
+                    .status(403)
+                    .build();
+        }
 
         return ResponseEntity.ok(
                 enrollmentService.getAllEnrollments()
         );
     }
 
-    // Get Enrollment By ID
+
+    // ==========================================
+    // GET BY ID
+    // ADMIN + OWN STUDENT
+    // ==========================================
+
     @GetMapping("/{id}")
-    public ResponseEntity<EnrollmentResponseDTO> getEnrollmentById(
-            @PathVariable Long id) {
+    public ResponseEntity<EnrollmentResponseDTO>
+    getEnrollmentById(
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        return enrollmentService.getEnrollmentById(id)
+        boolean isAdmin =
+                authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(authority ->
+                                authority.getAuthority()
+                                        .equals("ROLE_ADMIN")
+                        );
+
+        boolean isOwn =
+                enrollmentService.isOwnEnrollment(
+                        id,
+                        authentication.getName()
+                );
+
+        if (!isAdmin && !isOwn) {
+            return ResponseEntity
+                    .status(403)
+                    .build();
+        }
+
+        return enrollmentService
+                .getEnrollmentById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(
+                        ResponseEntity
+                                .notFound()
+                                .build()
+                );
     }
 
-    // Get Enrollments By Student
+
+    // ==========================================
+    // GET BY STUDENT
+    // ADMIN + OWN STUDENT
+    // ==========================================
+
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<EnrollmentResponseDTO>> getEnrollmentsByStudent(
-            @PathVariable Long studentId) {
+    public ResponseEntity<List<EnrollmentResponseDTO>>
+    getEnrollmentsByStudent(
+            @PathVariable Long studentId,
+            Authentication authentication) {
+
+        boolean isAdmin =
+                authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(authority ->
+                                authority.getAuthority()
+                                        .equals("ROLE_ADMIN")
+                        );
+
+        boolean isOwn =
+                enrollmentService.isOwnStudent(
+                        studentId,
+                        authentication.getName()
+                );
+
+        if (!isAdmin && !isOwn) {
+            return ResponseEntity
+                    .status(403)
+                    .build();
+        }
 
         return ResponseEntity.ok(
-                enrollmentService.getEnrollmentsByStudent(studentId)
+                enrollmentService
+                        .getEnrollmentsByStudent(studentId)
         );
     }
 
-    // Get Enrollments By Course
+
+    // ==========================================
+    // GET BY COURSE
+    // ADMIN ONLY
+    // ==========================================
+
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<EnrollmentResponseDTO>> getEnrollmentsByCourse(
-            @PathVariable Long courseId) {
+    public ResponseEntity<List<EnrollmentResponseDTO>>
+    getEnrollmentsByCourse(
+            @PathVariable Long courseId,
+            Authentication authentication) {
+
+        boolean isAdmin =
+                authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(authority ->
+                                authority.getAuthority()
+                                        .equals("ROLE_ADMIN")
+                        );
+
+        if (!isAdmin) {
+            return ResponseEntity
+                    .status(403)
+                    .build();
+        }
 
         return ResponseEntity.ok(
-                enrollmentService.getEnrollmentsByCourse(courseId)
+                enrollmentService
+                        .getEnrollmentsByCourse(courseId)
         );
     }
 
-    // Update Enrollment
+
+    // ==========================================
+    // UPDATE
+    // ADMIN ONLY
+    // ==========================================
+
     @PutMapping("/{id}")
-    public ResponseEntity<EnrollmentResponseDTO> updateEnrollment(
+    public ResponseEntity<EnrollmentResponseDTO>
+    updateEnrollment(
             @PathVariable Long id,
             @Valid @RequestBody EnrollmentRequestDTO request) {
 
         return ResponseEntity.ok(
-                enrollmentService.updateEnrollment(id, request)
+                enrollmentService.updateEnrollment(
+                        id,
+                        request
+                )
         );
     }
 
-    // Delete Enrollment
+
+    // ==========================================
+    // DELETE
+    // ADMIN ONLY
+    // ==========================================
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEnrollment(
             @PathVariable Long id) {
 
         enrollmentService.deleteEnrollment(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

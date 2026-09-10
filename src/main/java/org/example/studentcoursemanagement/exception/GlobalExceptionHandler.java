@@ -22,7 +22,10 @@ public class GlobalExceptionHandler {
         exception.getBindingResult()
                 .getFieldErrors()
                 .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage())
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
                 );
 
         return ResponseEntity
@@ -30,15 +33,28 @@ public class GlobalExceptionHandler {
                 .body(errors);
     }
 
-    // Handle general RuntimeException
+    // Handle RuntimeException
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(
             RuntimeException exception) {
 
         Map<String, String> error = new HashMap<>();
 
-        error.put("error", exception.getMessage());
+        String message = exception.getMessage();
 
+        error.put("error", message);
+
+        // Resource not found
+        if (message != null &&
+                (message.contains("not found") ||
+                        message.contains("Not found"))) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(error);
+        }
+
+        // Other runtime errors
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(error);

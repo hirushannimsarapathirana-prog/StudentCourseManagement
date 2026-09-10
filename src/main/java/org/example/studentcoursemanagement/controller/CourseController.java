@@ -19,7 +19,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    // Create Course
+    // ADMIN only
     @PostMapping
     public ResponseEntity<CourseResponseDTO> createCourse(
             @Valid @RequestBody CourseRequestDTO request) {
@@ -29,7 +29,7 @@ public class CourseController {
         );
     }
 
-    // Get All Courses
+    // ADMIN + STUDENT
     @GetMapping
     public ResponseEntity<List<CourseResponseDTO>> getAllCourses() {
 
@@ -38,7 +38,7 @@ public class CourseController {
         );
     }
 
-    // Get Course By ID
+    // ADMIN + STUDENT
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponseDTO> getCourseById(
             @PathVariable Long id) {
@@ -48,7 +48,7 @@ public class CourseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Update Course
+    // ADMIN only
     @PutMapping("/{id}")
     public ResponseEntity<CourseResponseDTO> updateCourse(
             @PathVariable Long id,
@@ -59,7 +59,7 @@ public class CourseController {
         );
     }
 
-    // Delete Course
+    // ADMIN only
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(
             @PathVariable Long id) {

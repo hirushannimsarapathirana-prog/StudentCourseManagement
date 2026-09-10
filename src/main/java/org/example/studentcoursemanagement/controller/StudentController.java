@@ -5,6 +5,7 @@ import org.example.studentcoursemanagement.dto.StudentRequestDTO;
 import org.example.studentcoursemanagement.dto.StudentResponseDTO;
 import org.example.studentcoursemanagement.service.StudentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,6 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    // Create Student
     @PostMapping
     public ResponseEntity<StudentResponseDTO> createStudent(
             @Valid @RequestBody StudentRequestDTO request) {
@@ -29,40 +29,90 @@ public class StudentController {
         );
     }
 
-    // Get All Students
     @GetMapping
-    public ResponseEntity<List<StudentResponseDTO>> getAllStudents() {
+    public ResponseEntity<List<StudentResponseDTO>> getAllStudents(
+            Authentication authentication) {
 
-        return ResponseEntity.ok(
-                studentService.getAllStudents()
-        );
+        // ADMIN can view all students
+        if (authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+
+            return ResponseEntity.ok(
+                    studentService.getAllStudents()
+            );
+        }
+
+        // STUDENT cannot view all students
+        return ResponseEntity.status(403).build();
     }
 
-    // Get Student By ID
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponseDTO> getStudentById(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isOwnProfile =
+                studentService.isOwnProfile(
+                        id,
+                        authentication.getName()
+                );
+
+        // ADMIN can view any student
+        // STUDENT can view only own profile
+        if (!isAdmin && !isOwnProfile) {
+            return ResponseEntity.status(403).build();
+        }
 
         return studentService.getStudentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Update Student
     @PutMapping("/{id}")
     public ResponseEntity<StudentResponseDTO> updateStudent(
             @PathVariable Long id,
-            @Valid @RequestBody StudentRequestDTO request) {
+            @Valid @RequestBody StudentRequestDTO request,
+            Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isOwnProfile =
+                studentService.isOwnProfile(
+                        id,
+                        authentication.getName()
+                );
+
+        // ADMIN can update any student
+        // STUDENT can update only own profile
+        if (!isAdmin && !isOwnProfile) {
+            return ResponseEntity.status(403).build();
+        }
 
         return ResponseEntity.ok(
                 studentService.updateStudent(id, request)
         );
     }
 
-    // Delete Student
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        // Only ADMIN can delete students
+        if (!isAdmin) {
+            return ResponseEntity.status(403).build();
+        }
 
         studentService.deleteStudent(id);
 

@@ -9,7 +9,11 @@ public class UserResponseDTO {
     public UserResponseDTO() {
     }
 
-    public UserResponseDTO(Long id, String username, String role) {
+    public UserResponseDTO(
+            Long id,
+            String username,
+            String role) {
+
         this.id = id;
         this.username = username;
         this.role = role;

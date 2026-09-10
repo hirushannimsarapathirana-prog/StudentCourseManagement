@@ -7,19 +7,27 @@ public class UserRequestDTO {
     @NotBlank(message = "Username is required")
     private String username;
 
-    @NotBlank(message = "Password is required")
+    // Password is optional when updating a user
     private String password;
 
     @NotBlank(message = "Role is required")
     private String role;
 
+    private Long studentId;
+
     public UserRequestDTO() {
     }
 
-    public UserRequestDTO(String username, String password, String role) {
+    public UserRequestDTO(
+            String username,
+            String password,
+            String role,
+            Long studentId) {
+
         this.username = username;
         this.password = password;
         this.role = role;
+        this.studentId = studentId;
     }
 
     public String getUsername() {
@@ -44,5 +52,13 @@ public class UserRequestDTO {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
     }
 }

@@ -69,11 +69,125 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+
+                        // =========================
+                        // AUTH
+                        // =========================
+
+                        .requestMatchers("/api/auth/**")
+                        .permitAll()
+
+
+                        // =========================
+                        // USERS
+                        // =========================
+
+                        .requestMatchers("/api/users/**")
+                        .hasRole("ADMIN")
+
+
+                        // =========================
+                        // STUDENTS
+                        // =========================
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.POST,
+                                "/api/students"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/students"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/students/**"
+                        )
+                        .hasAnyRole("ADMIN", "STUDENT")
+
+
+                        // =========================
+                        // COURSES
+                        // =========================
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/courses/**"
+                        )
+                        .hasAnyRole("ADMIN", "STUDENT")
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.POST,
+                                "/api/courses/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.PUT,
+                                "/api/courses/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.DELETE,
+                                "/api/courses/**"
+                        )
+                        .hasRole("ADMIN")
+
+
+                        // =========================
+                        // ENROLLMENTS
+                        // =========================
+
+                        // CREATE
+                        // ADMIN + STUDENT
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.POST,
+                                "/api/enrollments"
+                        )
+                        .hasAnyRole("ADMIN", "STUDENT")
+
+
+                        // GET
+                        // Controller checks ownership
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/enrollments/**"
+                        )
+                        .hasAnyRole("ADMIN", "STUDENT")
+
+
+                        // UPDATE
+                        // ADMIN only
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.PUT,
+                                "/api/enrollments/**"
+                        )
+                        .hasRole("ADMIN")
+
+
+                        // DELETE
+                        // ADMIN only
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.DELETE,
+                                "/api/enrollments/**"
+                        )
+                        .hasRole("ADMIN")
+
+
+                        // =========================
+                        // OTHER
+                        // =========================
+
+                        .anyRequest()
+                        .authenticated()
                 )
 
-                .authenticationProvider(authenticationProvider())
+                .authenticationProvider(
+                        authenticationProvider()
+                )
 
                 .addFilterBefore(
                         jwtAuthFilter,

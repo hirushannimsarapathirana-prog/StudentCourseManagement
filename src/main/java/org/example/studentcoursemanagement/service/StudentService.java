@@ -3,7 +3,10 @@ package org.example.studentcoursemanagement.service;
 import org.example.studentcoursemanagement.dto.StudentRequestDTO;
 import org.example.studentcoursemanagement.dto.StudentResponseDTO;
 import org.example.studentcoursemanagement.entity.Student;
+import org.example.studentcoursemanagement.entity.User;
 import org.example.studentcoursemanagement.repository.StudentRepository;
+import org.example.studentcoursemanagement.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,12 +16,16 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(
+            StudentRepository studentRepository,
+            UserRepository userRepository) {
+
         this.studentRepository = studentRepository;
+        this.userRepository = userRepository;
     }
 
-    // CREATE
     public StudentResponseDTO createStudent(StudentRequestDTO request) {
 
         Student student = new Student();
@@ -34,22 +41,27 @@ public class StudentService {
         return convertToResponseDTO(savedStudent);
     }
 
-    // GET ALL
     public List<StudentResponseDTO> getAllStudents() {
 
-        return studentRepository.findAll().stream().map(this::convertToResponseDTO).toList();
+        return studentRepository.findAll()
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
-    // GET BY ID
     public Optional<StudentResponseDTO> getStudentById(Long id) {
 
-        return studentRepository.findById(id).map(this::convertToResponseDTO);
+        return studentRepository.findById(id)
+                .map(this::convertToResponseDTO);
     }
 
-    // UPDATE
-    public StudentResponseDTO updateStudent(Long id, StudentRequestDTO request) {
+    public StudentResponseDTO updateStudent(
+            Long id,
+            StudentRequestDTO request) {
 
-        Student student = studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Student not found"));
 
         student.setFirstName(request.getFirstName());
         student.setLastName(request.getLastName());
@@ -57,12 +69,12 @@ public class StudentService {
         student.setPhone(request.getPhone());
         student.setAddress(request.getAddress());
 
-        Student updatedStudent = studentRepository.save(student);
+        Student updatedStudent =
+                studentRepository.save(student);
 
         return convertToResponseDTO(updatedStudent);
     }
 
-    // DELETE
     public void deleteStudent(Long id) {
 
         if (!studentRepository.existsById(id)) {
@@ -72,9 +84,34 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
-    // ENTITY → RESPONSE DTO
-    private StudentResponseDTO convertToResponseDTO(Student student) {
+    // Check whether the logged-in student owns this profile
+    public boolean isOwnProfile(
+            Long studentId,
+            String username) {
 
-        return new StudentResponseDTO(student.getId(), student.getFirstName(), student.getLastName(), student.getEmail(), student.getPhone(), student.getAddress());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        if (user.getStudent() == null) {
+            return false;
+        }
+
+        return user.getStudent()
+                .getId()
+                .equals(studentId);
+    }
+
+    private StudentResponseDTO convertToResponseDTO(
+            Student student) {
+
+        return new StudentResponseDTO(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getPhone(),
+                student.getAddress()
+        );
     }
 }

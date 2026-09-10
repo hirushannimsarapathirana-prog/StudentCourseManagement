@@ -16,14 +16,20 @@ public class User {
 
     private String role;
 
+    @OneToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
     public User() {
     }
 
-    public User(Long id, String username, String password, String role) {
+    public User(Long id, String username, String password,
+                String role, Student student) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.student = student;
     }
 
     public Long getId() {
@@ -56,5 +62,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
