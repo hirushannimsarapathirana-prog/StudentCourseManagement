@@ -1,5 +1,7 @@
 package org.example.studentcoursemanagement.service;
 
+import org.example.studentcoursemanagement.dto.StudentRequestDTO;
+import org.example.studentcoursemanagement.dto.StudentResponseDTO;
 import org.example.studentcoursemanagement.entity.Student;
 import org.example.studentcoursemanagement.repository.StudentRepository;
 import org.springframework.stereotype.Service;
@@ -16,33 +18,51 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
 
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
+    // CREATE
+    public StudentResponseDTO createStudent(StudentRequestDTO request) {
+
+        Student student = new Student();
+
+        student.setFirstName(request.getFirstName());
+        student.setLastName(request.getLastName());
+        student.setEmail(request.getEmail());
+        student.setPhone(request.getPhone());
+        student.setAddress(request.getAddress());
+
+        Student savedStudent = studentRepository.save(student);
+
+        return convertToResponseDTO(savedStudent);
     }
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    // GET ALL
+    public List<StudentResponseDTO> getAllStudents() {
+
+        return studentRepository.findAll().stream().map(this::convertToResponseDTO).toList();
     }
 
+    // GET BY ID
+    public Optional<StudentResponseDTO> getStudentById(Long id) {
 
-    public Optional<Student> getStudentById(Long id) {
-        return studentRepository.findById(id);
+        return studentRepository.findById(id).map(this::convertToResponseDTO);
     }
 
-    public Student updateStudent(Long id, Student studentDetails) {
+    // UPDATE
+    public StudentResponseDTO updateStudent(Long id, StudentRequestDTO request) {
 
         Student student = studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
 
-        student.setFirstName(studentDetails.getFirstName());
-        student.setLastName(studentDetails.getLastName());
-        student.setEmail(studentDetails.getEmail());
-        student.setPhone(studentDetails.getPhone());
-        student.setAddress(studentDetails.getAddress());
+        student.setFirstName(request.getFirstName());
+        student.setLastName(request.getLastName());
+        student.setEmail(request.getEmail());
+        student.setPhone(request.getPhone());
+        student.setAddress(request.getAddress());
 
-        return studentRepository.save(student);
+        Student updatedStudent = studentRepository.save(student);
+
+        return convertToResponseDTO(updatedStudent);
     }
 
-
+    // DELETE
     public void deleteStudent(Long id) {
 
         if (!studentRepository.existsById(id)) {
@@ -50,5 +70,11 @@ public class StudentService {
         }
 
         studentRepository.deleteById(id);
+    }
+
+    // ENTITY → RESPONSE DTO
+    private StudentResponseDTO convertToResponseDTO(Student student) {
+
+        return new StudentResponseDTO(student.getId(), student.getFirstName(), student.getLastName(), student.getEmail(), student.getPhone(), student.getAddress());
     }
 }

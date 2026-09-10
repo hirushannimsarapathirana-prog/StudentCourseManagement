@@ -1,6 +1,8 @@
 package org.example.studentcoursemanagement.controller;
 
-import org.example.studentcoursemanagement.entity.Enrollment;
+import jakarta.validation.Valid;
+import org.example.studentcoursemanagement.dto.EnrollmentRequestDTO;
+import org.example.studentcoursemanagement.dto.EnrollmentResponseDTO;
 import org.example.studentcoursemanagement.service.EnrollmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,25 +19,28 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
+    // Create Enrollment
     @PostMapping
-    public ResponseEntity<Enrollment> createEnrollment(
-            @RequestParam Long studentId,
-            @RequestParam Long courseId) {
+    public ResponseEntity<EnrollmentResponseDTO> createEnrollment(
+            @Valid @RequestBody EnrollmentRequestDTO request) {
 
         return ResponseEntity.ok(
-                enrollmentService.createEnrollment(studentId, courseId)
+                enrollmentService.createEnrollment(request)
         );
     }
 
+    // Get All Enrollments
     @GetMapping
-    public ResponseEntity<List<Enrollment>> getAllEnrollments() {
+    public ResponseEntity<List<EnrollmentResponseDTO>> getAllEnrollments() {
+
         return ResponseEntity.ok(
                 enrollmentService.getAllEnrollments()
         );
     }
 
+    // Get Enrollment By ID
     @GetMapping("/{id}")
-    public ResponseEntity<Enrollment> getEnrollmentById(
+    public ResponseEntity<EnrollmentResponseDTO> getEnrollmentById(
             @PathVariable Long id) {
 
         return enrollmentService.getEnrollmentById(id)
@@ -43,8 +48,9 @@ public class EnrollmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Get Enrollments By Student
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<Enrollment>> getEnrollmentsByStudent(
+    public ResponseEntity<List<EnrollmentResponseDTO>> getEnrollmentsByStudent(
             @PathVariable Long studentId) {
 
         return ResponseEntity.ok(
@@ -52,8 +58,9 @@ public class EnrollmentController {
         );
     }
 
+    // Get Enrollments By Course
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<Enrollment>> getEnrollmentsByCourse(
+    public ResponseEntity<List<EnrollmentResponseDTO>> getEnrollmentsByCourse(
             @PathVariable Long courseId) {
 
         return ResponseEntity.ok(
@@ -61,21 +68,18 @@ public class EnrollmentController {
         );
     }
 
+    // Update Enrollment
     @PutMapping("/{id}")
-    public ResponseEntity<Enrollment> updateEnrollment(
+    public ResponseEntity<EnrollmentResponseDTO> updateEnrollment(
             @PathVariable Long id,
-            @RequestParam Long studentId,
-            @RequestParam Long courseId) {
+            @Valid @RequestBody EnrollmentRequestDTO request) {
 
         return ResponseEntity.ok(
-                enrollmentService.updateEnrollment(
-                        id,
-                        studentId,
-                        courseId
-                )
+                enrollmentService.updateEnrollment(id, request)
         );
     }
 
+    // Delete Enrollment
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEnrollment(
             @PathVariable Long id) {

@@ -1,5 +1,7 @@
 package org.example.studentcoursemanagement.service;
 
+import org.example.studentcoursemanagement.dto.EnrollmentRequestDTO;
+import org.example.studentcoursemanagement.dto.EnrollmentResponseDTO;
 import org.example.studentcoursemanagement.entity.Course;
 import org.example.studentcoursemanagement.entity.Enrollment;
 import org.example.studentcoursemanagement.entity.Student;
@@ -19,18 +21,27 @@ public class EnrollmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
 
-    public EnrollmentService(EnrollmentRepository enrollmentRepository, StudentRepository studentRepository, CourseRepository courseRepository) {
+    public EnrollmentService(
+            EnrollmentRepository enrollmentRepository,
+            StudentRepository studentRepository,
+            CourseRepository courseRepository) {
 
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
     }
 
-    public Enrollment createEnrollment(Long studentId, Long courseId) {
+    // CREATE
+    public EnrollmentResponseDTO createEnrollment(
+            EnrollmentRequestDTO request) {
 
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new RuntimeException("Student not found"));
+        Student student = studentRepository.findById(request.getStudentId())
+                .orElseThrow(() ->
+                        new RuntimeException("Student not found"));
 
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() ->
+                        new RuntimeException("Course not found"));
 
         Enrollment enrollment = new Enrollment();
 
@@ -38,39 +49,77 @@ public class EnrollmentService {
         enrollment.setCourse(course);
         enrollment.setEnrollmentDate(LocalDate.now());
 
-        return enrollmentRepository.save(enrollment);
+        Enrollment savedEnrollment =
+                enrollmentRepository.save(enrollment);
+
+        return convertToResponseDTO(savedEnrollment);
     }
 
-    public List<Enrollment> getAllEnrollments() {
-        return enrollmentRepository.findAll();
+    // GET ALL
+    public List<EnrollmentResponseDTO> getAllEnrollments() {
+
+        return enrollmentRepository.findAll()
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
-    public Optional<Enrollment> getEnrollmentById(Long id) {
-        return enrollmentRepository.findById(id);
+    // GET BY ID
+    public Optional<EnrollmentResponseDTO> getEnrollmentById(Long id) {
+
+        return enrollmentRepository.findById(id)
+                .map(this::convertToResponseDTO);
     }
 
-    public List<Enrollment> getEnrollmentsByStudent(Long studentId) {
-        return enrollmentRepository.findByStudentId(studentId);
+    // GET BY STUDENT
+    public List<EnrollmentResponseDTO> getEnrollmentsByStudent(
+            Long studentId) {
+
+        return enrollmentRepository.findByStudentId(studentId)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
-    public List<Enrollment> getEnrollmentsByCourse(Long courseId) {
-        return enrollmentRepository.findByCourseId(courseId);
+    // GET BY COURSE
+    public List<EnrollmentResponseDTO> getEnrollmentsByCourse(
+            Long courseId) {
+
+        return enrollmentRepository.findByCourseId(courseId)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
-    public Enrollment updateEnrollment(Long id, Long studentId, Long courseId) {
+    // UPDATE
+    public EnrollmentResponseDTO updateEnrollment(
+            Long id,
+            EnrollmentRequestDTO request) {
 
-        Enrollment enrollment = enrollmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Enrollment not found"));
+        Enrollment enrollment = enrollmentRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Enrollment not found"));
 
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new RuntimeException("Student not found"));
+        Student student =
+                studentRepository.findById(request.getStudentId())
+                        .orElseThrow(() ->
+                                new RuntimeException("Student not found"));
 
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        Course course =
+                courseRepository.findById(request.getCourseId())
+                        .orElseThrow(() ->
+                                new RuntimeException("Course not found"));
 
         enrollment.setStudent(student);
         enrollment.setCourse(course);
 
-        return enrollmentRepository.save(enrollment);
+        Enrollment updatedEnrollment =
+                enrollmentRepository.save(enrollment);
+
+        return convertToResponseDTO(updatedEnrollment);
     }
 
+    // DELETE
     public void deleteEnrollment(Long id) {
 
         if (!enrollmentRepository.existsById(id)) {
@@ -78,5 +127,24 @@ public class EnrollmentService {
         }
 
         enrollmentRepository.deleteById(id);
+    }
+
+    // ENTITY → RESPONSE DTO
+    private EnrollmentResponseDTO convertToResponseDTO(
+            Enrollment enrollment) {
+
+        String studentName =
+                enrollment.getStudent().getFirstName()
+                        + " "
+                        + enrollment.getStudent().getLastName();
+
+        return new EnrollmentResponseDTO(
+                enrollment.getId(),
+                enrollment.getEnrollmentDate(),
+                enrollment.getStudent().getId(),
+                studentName,
+                enrollment.getCourse().getId(),
+                enrollment.getCourse().getCourseName()
+        );
     }
 }
